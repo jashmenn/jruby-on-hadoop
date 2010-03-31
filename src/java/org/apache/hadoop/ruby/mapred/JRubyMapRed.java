@@ -4,10 +4,12 @@ import java.io.IOException;
 
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.ruby.JRubyEvaluator;
+import org.apache.hadoop.mapred.JobConf;
 
 public class JRubyMapRed {
 
 	private JRubyEvaluator evaluator;
+    protected JobConf jobconf;
 
 	public JRubyMapRed() {
 	}
@@ -18,6 +20,7 @@ public class JRubyMapRed {
 
 	public void configure(JobConf job) {
 		evaluator = new JRubyEvaluator(job);
+        jobconf = job;
 	}
 
 	public void close() throws IOException {

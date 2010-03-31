@@ -31,7 +31,6 @@ public class JRubyEvaluator {
 	public JRubyEvaluator(JobConf conf) {
 		scriptFileName = conf.get("mapred.ruby.script");
 		dslFileName = conf.get("mapred.ruby.dslfile");
-
 		setupEngine();
 	}
 
@@ -44,10 +43,10 @@ public class JRubyEvaluator {
 	}
 
 	public Object invoke(String methodName, Object key, Object value,
-			Object output, Object reporter) throws ScriptException {
+			Object output, Object reporter, Object jobconf) throws ScriptException {
 		Object self = null; // if receiver is null, should use toplevel.
 		Object result = rubyEngine.callMethod(self, methodName, new Object[] {
-				key, value, output, reporter, scriptFileName, dslFileName },
+				key, value, output, reporter, jobconf, scriptFileName, dslFileName },
 				null);
 		invokeCounter++;
 		return result;

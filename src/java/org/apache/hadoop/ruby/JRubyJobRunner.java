@@ -27,20 +27,17 @@ public class JRubyJobRunner extends Configured implements Tool {
 		CommandLineParser parser = new GnuParser();
 		Options options = new Options();
 		options.addOption(new Option("script", true, "ruby script"));
-		options
-				.addOption(new Option("dslfile", true, "hadoop ruby DSL script"));
+		options.addOption(new Option("dslfile", true, "hadoop ruby DSL script"));
 
 		CommandLine commandLine = parser.parse(options, args);
 		JobConf conf = new JobConf(getConf(), JRubyJobRunner.class);
 		conf.setJobName("ruby.runner");
 
 		if (commandLine.hasOption("script")) {
-			conf.set("mapred.ruby.script", commandLine.getOptionValue("script",
-					"mapred.rb"));
+			conf.set("mapred.ruby.script", commandLine.getOptionValue("script", "mapred.rb"));
 		}
 		if (commandLine.hasOption("dslfile")) {
-			conf.set("mapred.ruby.dslfile", commandLine
-					.getOptionValue("dslfile"));
+			conf.set("mapred.ruby.dslfile", commandLine.getOptionValue("dslfile"));
 		}
 //		System.out.println(options.toString());
 //		System.out.println(conf.get("mapred.ruby.script"));

@@ -10,17 +10,19 @@ def wrap_setup(conf, script, dslfile)
   paths.to_java if paths
 end
 
-def wrap_map(key, value, output, reporter, script, dslfile)
+def wrap_map(key, value, output, reporter, jobconf, script, dslfile)
   require script
   output_wrapper = OutputWrapper.new(output)
+  setup_map(output_wrapper, reporter, jobconf) if self.respond_to?(:setup_map)
   dslfile ? 
     map(to_ruby(key), to_ruby(value), output_wrapper, reporter, dslfile) :
     map(to_ruby(key), to_ruby(value), output_wrapper, reporter)
 end
 
-def wrap_reduce(key, values, output, reporter, script, dslfile)
+def wrap_reduce(key, values, output, reporter, jobconf, script, dslfile)
   require script
   output_wrapper = OutputWrapper.new(output)
+  setup_reduce(output_wrapper, reporter, jobconf) if self.respond_to?(:setup_reduce)
   dslfile ?
     reduce(to_ruby(key), to_ruby(values), output_wrapper, reporter, dslfile) :
     reduce(to_ruby(key), to_ruby(values), output_wrapper, reporter)
