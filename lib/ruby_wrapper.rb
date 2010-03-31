@@ -4,6 +4,8 @@ import 'org.apache.hadoop.io.IntWritable'
 import 'org.apache.hadoop.io.LongWritable'
 import 'org.apache.hadoop.io.Text'
 
+@_setup_map = false
+
 def wrap_setup(conf, script, dslfile)
   require script
   paths = dslfile ? setup(conf, dslfile) : setup(conf)
@@ -13,7 +15,14 @@ end
 def wrap_map(key, value, output, reporter, jobconf, script, dslfile)
   require script
   output_wrapper = OutputWrapper.new(output)
-  setup_map(output_wrapper, reporter, jobconf) if self.respond_to?(:setup_map)
+  begin
+    unless @_setup_map # ew
+      setup_map(output_wrapper, reporter, jobconf) 
+      @_setup_map = true
+    end
+  rescue NoMethodError
+    # might not be defined
+  end
   dslfile ? 
     map(to_ruby(key), to_ruby(value), output_wrapper, reporter, dslfile) :
     map(to_ruby(key), to_ruby(value), output_wrapper, reporter)
@@ -22,7 +31,12 @@ end
 def wrap_reduce(key, values, output, reporter, jobconf, script, dslfile)
   require script
   output_wrapper = OutputWrapper.new(output)
-  setup_reduce(output_wrapper, reporter, jobconf) if self.respond_to?(:setup_reduce)
+  begin
+    setup_reduce(output_wrapper, reporter, jobconf) 
+  rescue NoMethodError
+    # might not be defined
+  end
+
   dslfile ?
     reduce(to_ruby(key), to_ruby(values), output_wrapper, reporter, dslfile) :
     reduce(to_ruby(key), to_ruby(values), output_wrapper, reporter)
