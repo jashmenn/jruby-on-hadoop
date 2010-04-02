@@ -52,18 +52,24 @@ public class JRubyJobRunner extends Configured implements Tool {
 
 		String[] otherArgs = commandLine.getArgs();
 		if (otherArgs.length >= 2) {
-			FileInputFormat.setInputPaths(conf, otherArgs[0]);
-			FileOutputFormat.setOutputPath(conf, new Path(otherArgs[1]));
+		  for(int i=0; i < otherArgs.length - 1; i++) {
+			System.out.println("input: " + otherArgs[i]);
+			FileInputFormat.addInputPaths(conf, otherArgs[i]);
+		  }
+		  FileOutputFormat.setOutputPath(conf, new Path((String) otherArgs[otherArgs.length-1]));
 		}
 
 		// override by Ruby script
 		JRubyEvaluator evaluator = new JRubyEvaluator(conf);
 		try {
-			Object[] paths = (Object[]) evaluator.invoke("wrap_setup", conf);
-			if (paths != null && paths.length == 2) {
-				FileInputFormat.setInputPaths(conf, (String) paths[0]);
-				FileOutputFormat.setOutputPath(conf, new Path((String) paths[1]));
+		  Object[] paths = (Object[]) evaluator.invoke("wrap_setup", conf);
+		  if (paths != null && paths.length >= 2) {
+			for(int i=0; i < paths.length - 1; i++) {
+			  System.out.println("input: " + paths[i]);
+			  FileInputFormat.addInputPaths(conf, (String) paths[i]);
 			}
+			FileOutputFormat.setOutputPath(conf, new Path((String) paths[paths.length-1]));
+		  }
 		} catch (ScriptException e) {
 			// do nothing. maybe user script has no "setup" method
 		}
