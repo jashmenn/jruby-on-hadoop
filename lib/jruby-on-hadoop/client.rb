@@ -24,9 +24,9 @@ module JRubyOnHadoop
     end
 
     def hadoop_classpath
+      require 'pp'
       ENV['HADOOP_CLASSPATH'] ||= ""
-      ENV['HADOOP_CLASSPATH'] += ":" + 
-        ([lib_path, File.dirname(@script_path)] + jruby_jars).join(':')
+      ENV['HADOOP_CLASSPATH'] += ([lib_path] + @dirnames + jruby_jars).join(':')
     end
 
     def run
@@ -40,19 +40,30 @@ module JRubyOnHadoop
     end
 
     def parse_args
-      @script_path = @args.size > 0 ? @args[0] : 'mapred.rb'
-      @script = File.basename(@script_path) 
-      @inputs = @args[1] if @args.size == 3
-      @outputs = @args[2] if @args.size == 3
-      @files = [@script_path, JRubyOnHadoop.wrapper_ruby_file, ENV["HADOOP_FILES"]]
+      raise "Usage: joh script_path input_path output_path" if @args.size < 3
+      @script_path = @args[0]
+      @script = File.basename(@script_path)
+      @files = [@script_path, JRubyOnHadoop.wrapper_ruby_file]
+      @files << ENV["HADOOP_FILES"] if ENV["HADOOP_FILES"]
+      @dirnames = [File.dirname(@script_path), File.dirname(JRubyOnHadoop.wrapper_ruby_file)]
+      @args.each do |arg|
+        if File.file?(arg) and !@files.include?(arg) 
+          @files << arg
+          @dirnames << File.dirname(arg)
+        end
+      end
     end
 
     def mapred_args
       args = ""
       args += ENV['HADOOP_ARGS'] + " " if ENV['HADOOP_ARGS']
       args += "--script #{@script} "
-      args += "#{@inputs} "   if @inputs
-      args += "#{@outputs} " if @outputs
+      (1..@args.size-1).each do |index| 
+        arg = @args[index]
+        # arg = File.basename(arg) if File.file?(arg)
+        # arg = File.basename(arg) if File.file?(arg)
+        args += "#{arg} "
+      end
       args
     end
 
