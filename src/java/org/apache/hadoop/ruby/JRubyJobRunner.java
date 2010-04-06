@@ -53,7 +53,6 @@ public class JRubyJobRunner extends Configured implements Tool {
 		String[] otherArgs = commandLine.getArgs();
 		if (otherArgs.length >= 2) {
 		  for(int i=0; i < otherArgs.length - 1; i++) {
-			System.out.println("input: " + otherArgs[i]);
 			FileInputFormat.addInputPaths(conf, otherArgs[i]);
 		  }
 		  FileOutputFormat.setOutputPath(conf, new Path((String) otherArgs[otherArgs.length-1]));
@@ -65,7 +64,6 @@ public class JRubyJobRunner extends Configured implements Tool {
 		  Object[] paths = (Object[]) evaluator.invoke("wrap_setup", conf);
 		  if (paths != null && paths.length >= 2) {
 			for(int i=0; i < paths.length - 1; i++) {
-			  System.out.println("input: " + paths[i]);
 			  FileInputFormat.addInputPaths(conf, (String) paths[i]);
 			}
 			FileOutputFormat.setOutputPath(conf, new Path((String) paths[paths.length-1]));
