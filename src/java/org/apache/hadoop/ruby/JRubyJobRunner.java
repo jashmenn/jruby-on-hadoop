@@ -47,7 +47,9 @@ public class JRubyJobRunner extends Configured implements Tool {
 		conf.setOutputValueClass(IntWritable.class);
 
 		conf.setMapperClass(JRubyMapper.class);
-		conf.setCombinerClass(JRubyReducer.class);
+		if(commandLine.hasOption("combiner")) {
+		  conf.setCombinerClass(JRubyReducer.class);
+		}
 		conf.setReducerClass(JRubyReducer.class);
 
 		String[] otherArgs = commandLine.getArgs();
